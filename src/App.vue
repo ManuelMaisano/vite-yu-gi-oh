@@ -1,10 +1,12 @@
 <template>
   <HeaderComponent />
   <MainComponent />
+
 </template>
 
 <script>
-import { store } from './store';
+import { store } from './data/store';
+import axios from 'axios';
 import HeaderComponent from './components/HeaderComponent.vue';
 import MainComponent from './components/MainComponent.vue';
   export default {
@@ -17,8 +19,29 @@ import MainComponent from './components/MainComponent.vue';
       return{
         store
       }
-    }
-  }
+    },
+    methods: {
+      getCards() {
+        axios
+        .get(this.store.api_url)
+        .then((res) => {
+          this.store.cards = res.data.data 
+          this.store.numCards = res.data.meta.numCards
+          console.log(this.store.cards)
+          console.log(this.store.numCards)
+        
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+        
+      }
+    },
+    created() {
+      this.getCards()
+    
+  },
+}
 </script>
 
 <style lang="scss" scoped>
