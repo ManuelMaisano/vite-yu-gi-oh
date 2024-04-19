@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent />
+  <HeaderComponent  @statusChange="setParameters" />
   <MainComponent />
 
 </template>
@@ -21,24 +21,42 @@ import MainComponent from './components/MainComponent.vue';
       }
     },
     methods: {
+      setParameters(){
+        if(this.store.status){
+          this.store.options.params.archetype = this.store.status
+        }else{
+          delete this.store.options.params.archetype
+        }
+        this.getCards();
+    },
+     
       getCards() {
         axios
-        .get(this.store.api_url)
+        .get(this.store.apiUrl+ this.store.endPoint.cards, this.store.options)
         .then((res) => {
-          this.store.cards = res.data.data 
-          this.store.numCards = res.data.meta.numCards
-          console.log(this.store.cards)
-          console.log(this.store.numCards)
-        
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-        
-      }
+            this.store.cards = res.data.data
+            this.store.current_rows = res.data.meta.current_rows
+            this.store.archetype = res.data.data.map(card => card.archetype)
+            console.log(this.store.cards)
+            console.log(this.store.current_rows)
+          }).catch((error) => {
+            console.log(error);
+          
+          });
+      },
+      getArchetypeSel() {
+        axios.get(this.store.apiUrl + this.store.endPoint.archetype)
+          .then((res) => {
+            this.store.archetypeSel = res.data.slice(200, 215);
+            console.log(this.store.archetypeSel);
+            console.log(this.status)
+          });
+      },
     },
     created() {
-      this.getCards()
+      this.getArchetypeSel();
+      this.getCards();
+      
     
   },
 }
